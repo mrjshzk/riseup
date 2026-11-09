@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Every value here is a token from res/values/colors.xml. No hex lives in the theme.
+  The platform Theme.Material only supplies window chrome; all widgets are drawn in
+  Kotlin, so the theme's Material styling never surfaces.
+-->
+<resources>
+    <style name="AppTheme" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/riseup_bg</item>
+        <item name="android:colorBackground">@color/riseup_bg</item>
+        <item name="android:statusBarColor">@color/riseup_bg</item>
+        <item name="android:navigationBarColor">@color/riseup_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:colorAccent">@color/riseup_accent</item>
+        <item name="android:textColorPrimary">@color/riseup_text</item>
+        <item name="android:textColorSecondary">@color/riseup_text_dim</item>
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+
+    <!-- Ringing screen: same window, status bar hidden at runtime in paintWindow(). -->
+    <style name="AlarmTheme" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/riseup_bg</item>
+        <item name="android:colorBackground">@color/riseup_bg</item>
+        <item name="android:statusBarColor">@color/riseup_bg</item>
+        <item name="android:navigationBarColor">@color/riseup_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:colorAccent">@color/riseup_accent</item>
+        <item name="android:textColorPrimary">@color/riseup_text</item>
+        <item name="android:textColorSecondary">@color/riseup_text_dim</item>
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>

@@ -1,0 +1,10 @@
+# Gradle / Android build output
+.gradle/
+**/build/
+local.properties
+*.iml
+.idea/
+.DS_Store
+
+# Local APKs and emulator screenshots; binaries are published as GitHub Releases assets
+dist/

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  RiseUp colour resources — drop-in.
+  Source of truth for docs/design-system.md §4 and docs/ui-spec.md.
+
+  HOW TO SHIP
+  ===========
+  The app is dark-first (it is used at 06:00 in a dark bathroom), so the
+  unsuffixed names below are the DARK set and belong in res/values/colors.xml.
+  When a light theme is added, move the DARK block to res/values-night/colors.xml
+  and the `*_light` block to res/values/colors.xml, renaming away the suffix.
+  Kotlin must only ever reference the unsuffixed names.
+
+  Measured contrast (WCAG 2.1, computed, not estimated) is recorded per token.
+  Nothing here is a gradient, a shadow or a translucent overlay: every value is
+  an opaque flat fill.
+-->
+<resources>
+
+    <!-- ============================== DARK (default) ==============================
+         Ratios are "token vs riseup_bg" unless stated otherwise.               -->
+
+    <!-- Surfaces -->
+    <color name="riseup_bg">#0A0A0B</color>            <!-- 0dp plane. Near-black, not #000: pure black kills the 1dp borders. -->
+    <color name="riseup_surface">#131315</color>       <!-- raised plane: pressed rows, sheet, dialogs. 1.10:1 vs bg, felt not seen. -->
+    <color name="riseup_surface_press">#1C1C1F</color> <!-- pressed fill for rows on bg. -->
+    <color name="riseup_line">#2A2A2E</color>          <!-- 1dp border / divider. 1.38:1 vs bg. -->
+
+    <!-- Text -->
+    <color name="riseup_text">#F4F3EF</color>          <!-- 17.82:1 vs bg. Slightly warm white, not #FFFFFF. -->
+    <color name="riseup_text_dim">#9B9BA1</color>      <!-- 7.16:1 vs bg. Secondary copy, inactive labels. -->
+    <color name="riseup_text_faint">#85858B</color>    <!-- 5.40:1 vs bg. Footer / legal only. -->
+
+    <!-- One accent. Coral, 9.8° hue. 7.17:1 vs bg, 7.17:1 against its own ink. -->
+    <color name="riseup_accent">#FF6E52</color>
+    <color name="riseup_accent_ink">#0A0A0B</color>    <!-- label ON accent fill. -->
+    <color name="riseup_accent_press">#E05F45</color>  <!-- pressed accent fill; ink on it 5.55:1. -->
+
+    <!-- Primary action. Always the maximum-contrast pair in the theme. -->
+    <color name="riseup_action_fill">#F4F3EF</color>   <!-- 17.82:1 with riseup_action_ink. -->
+    <color name="riseup_action_ink">#0A0A0B</color>
+    <color name="riseup_action_press">#D9D8D3</color>  <!-- 13.87:1 with ink. -->
+
+    <!-- Semantics. Dots and 13sp labels only — never a fill, never a second red. -->
+    <color name="riseup_success">#3ECF6B</color>       <!-- 9.75:1 vs bg. -->
+    <color name="riseup_warning">#FFB020</color>       <!-- 10.82:1 vs bg. -->
+    <!-- error == riseup_accent. There is no second red. -->
+
+    <!-- Scrim for the camera gate: flat 70% black, no blur. -->
+    <color name="riseup_scrim">#B3000000</color>
+
+
+    <!-- ============================== LIGHT (not shipped yet) ====================
+         Same roles, same names + _light. Accent is the same hue at 9.1°,
+         darkened so it passes AA on ivory.                                     -->
+
+    <color name="riseup_bg_light">#F4F2ED</color>
+    <color name="riseup_surface_light">#FFFFFF</color>
+    <color name="riseup_surface_press_light">#EAE7E0</color>
+    <color name="riseup_line_light">#D8D4CB</color>
+
+    <color name="riseup_text_light">#141414</color>          <!-- 16.47:1 vs bg. -->
+    <color name="riseup_text_dim_light">#5A5A5F</color>      <!-- 6.13:1 vs bg. -->
+    <color name="riseup_text_faint_light">#6E6E73</color>    <!-- 4.53:1 vs bg. -->
+
+    <color name="riseup_accent_light">#A62C15</color>        <!-- 6.27:1 vs bg, 7.02:1 on surface. -->
+    <color name="riseup_accent_ink_light">#FFFFFF</color>    <!-- 7.02:1 on accent. -->
+    <color name="riseup_accent_press_light">#8C2411</color>  <!-- white on it 8.84:1. -->
+
+    <color name="riseup_action_fill_light">#141414</color>   <!-- 16.47:1 with action ink. -->
+    <color name="riseup_action_ink_light">#F4F3EF</color>
+    <color name="riseup_action_press_light">#33332F</color>
+
+    <color name="riseup_success_light">#146B31</color>       <!-- 5.91:1 vs bg. -->
+    <color name="riseup_warning_light">#7A4F00</color>       <!-- 6.37:1 vs bg. -->
+
+    <color name="riseup_scrim_light">#99000000</color>
+
+</resources>

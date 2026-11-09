@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RiseUp</string>
+
+    <!-- MainActivity -->
+    <string name="home_wordmark">RISEUP</string>
+    <string name="home_state_on">ON</string>
+    <string name="home_state_off">OFF</string>
+    <string name="next_label">NEXT ALARM</string>
+    <string name="home_next_none">No day is on</string>
+    <string name="home_no_time">--:--</string>
+    <string name="home_hero_none">No alarm scheduled</string>
+
+    <!-- weekly schedule summary on the home screen -->
+    <string name="schedule_none">No days on</string>
+    <string name="schedule_every_day">Every day · %1$s</string>
+    <string name="schedule_weekdays">Mon–Fri · %1$s</string>
+    <string name="schedule_days">%1$s · %2$s</string>
+    <string name="schedule_mixed">%1$d days · from %2$s</string>
+    <string name="week_open">EDIT</string>
+    <string name="week_open_cd">Weekly schedule. %1$s. Edit.</string>
+
+    <!-- WeekScheduleActivity -->
+    <string name="week_title">WEEKLY SCHEDULE</string>
+    <string name="week_intro">Choose which days ring and at what time.</string>
+    <string name="week_done">DONE</string>
+    <string name="week_col_day">DAY</string>
+    <string name="week_col_time">TIME</string>
+    <string name="week_col_ring">RING</string>
+    <string name="week_day_on">ON</string>
+    <string name="week_day_off">OFF</string>
+    <string name="week_time_cd">%1$s time %2$s. Change.</string>
+    <string name="week_ring_on_cd">%1$s rings %2$s. Turn off.</string>
+    <string name="week_ring_off_cd">%1$s is off. Turn on.</string>
+    <string name="week_select_cd">%1$s. Pick as copy source.</string>
+    <string name="week_copy_section">COPY A TIME</string>
+    <string name="week_copy_source">Source: %1$s %2$s. Tap a day to change the source. Times only; on/off stays.</string>
+    <string name="week_copy_weekdays">COPY TO MON–FRI</string>
+    <string name="week_copy_all">COPY TO ALL 7</string>
+
+    <!-- dismiss code -->
+    <string name="code_section">DISMISS CODE</string>
+    <string name="code_none">No code enrolled. The alarm cannot be stopped.</string>
+    <string name="code_enrolled">Enrolled %1$s</string>
+    <string name="code_enrol">SCAN TO ENROLL</string>
+    <string name="code_replace">REPLACE CODE</string>
+    <string name="code_clear">REMOVE CODE</string>
+    <string name="code_clear_again">TAP AGAIN</string>
+
+    <!-- readiness summary + required checklist -->
+    <string name="req_section">REQUIRED</string>
+    <string name="req_ready">READY</string>
+    <string name="req_fix_one">1 FIX NEEDED</string>
+    <string name="req_fix_many">%1$d FIXES NEEDED</string>
+    <string name="req_show">SHOW</string>
+    <string name="req_hide">HIDE</string>
+    <string name="req_summary_cd">%1$s. %2$s details.</string>
+    <string name="req_exact">Exact alarms</string>
+    <string name="req_fsi">Full-screen alarm</string>
+    <string name="req_notifications">Notifications</string>
+    <string name="req_camera">Camera</string>
+    <string name="req_steps">Step sensor</string>
+    <string name="req_battery">Battery unrestricted</string>
+    <string name="req_fix">FIX</string>
+    <string name="req_ok">%1$s, allowed</string>
+    <string name="req_missing">%1$s, not allowed. Fix</string>
+    <string name="os_note">NOTHING OS: SETTINGS / APPS / RISEUP / BATTERY / UNRESTRICTED.</string>
+
+    <!-- dry run -->
+    <string name="test_section">DRY RUN</string>
+    <string name="test_body">Fires in 10 seconds. Walk away from the phone.</string>
+    <string name="test_action">TEST THE WHOLE CHAIN</string>
+    <string name="test_armed">ARMED — FIRES IN 10s</string>
+
+    <!-- AlarmActivity -->
+    <string name="alarm_eyebrow">WAKE UP</string>
+    <string name="alarm_hint">SCAN THE CODE IN THE OTHER ROOM</string>
+    <string name="alarm_hint_none">NO CODE ENROLLED. SCAN ANYTHING TO STOP.</string>
+    <string name="alarm_action">SCAN TO STOP</string>
+    <string name="alarm_action_none">SCAN TO ENROLL</string>
+    <string name="alarm_footnote">NO SNOOZE. 40 STEPS 90s AFTER YOU SCAN.</string>
+
+    <!-- guard -->
+    <string name="guard_eyebrow">STILL UP?</string>
+    <string name="guard_unit">STEPS TO GO</string>
+    <string name="guard_unit_one">STEP TO GO</string>
+    <string name="guard_footnote">STOP MOVING AND THIS COMES BACK LOUDER.</string>
+    <string name="guard_no_sensor">STEP SENSOR OFF. SCAN THE CODE AGAIN.</string>
+    <string name="guard_scan_again">SCAN AGAIN</string>
+
+    <!-- ScanActivity -->
+    <string name="scan_title">SCAN THE CODE</string>
+    <string name="scan_title_enroll">SCAN A CODE TO USE</string>
+    <string name="scan_hint">Hold it inside the frame</string>
+    <string name="scan_status_wrong">WRONG CODE</string>
+    <string name="scan_status_ok">CODE ACCEPTED</string>
+    <string name="scan_status_camera_denied">CAMERA BLOCKED. ENABLE IT IN SETTINGS.</string>
+    <string name="scan_status_camera_failed">CAMERA UNAVAILABLE</string>
+    <string name="scan_cancel">CANCEL</string>
+    <string name="scan_torch">LIGHT</string>
+    <string name="scan_torch_on">LIGHT ON</string>
+
+    <!-- notifications -->
+    <string name="notif_title_alarm">WAKE UP</string>
+    <string name="notif_title_guard">STILL UP?</string>
+    <string name="notif_text_alarm">Scan your code to stop</string>
+    <string name="notif_text_guard">40 steps or the alarm returns</string>
+</resources>
