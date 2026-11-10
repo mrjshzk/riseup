@@ -1,4 +1,4 @@
-package com.mrjshzk/riseup
+package com.mrjshzk.riseup
 
 import android.Manifest
 import android.annotation.SuppressLint
