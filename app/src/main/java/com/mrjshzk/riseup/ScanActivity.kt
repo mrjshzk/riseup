@@ -67,6 +67,9 @@ class ScanActivity : ComponentActivity() {
         scanner = BarcodeScanning.getClient()
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        // Dismissing starts from the lock screen; the scan must open there too.
+        // Enrolling changes the code, so it stays behind the keyguard.
+        if (!enrolling) setShowWhenLocked(true)
 
         val root = FrameLayout(this).apply {
             setBackgroundColor(ui.c(R.color.riseup_bg))

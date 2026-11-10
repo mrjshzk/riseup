@@ -2,6 +2,11 @@
 <resources>
     <string name="app_name">RiseUp</string>
 
+    <!-- Navigation Tabs -->
+    <string name="tab_alarm">ALARM</string>
+    <string name="tab_schedule">SCHEDULE</string>
+    <string name="tab_settings">SETTINGS</string>
+
     <!-- MainActivity -->
     <string name="home_wordmark">RISEUP</string>
     <string name="home_state_on">ON</string>
@@ -10,6 +15,12 @@
     <string name="home_next_none">No day is on</string>
     <string name="home_no_time">--:--</string>
     <string name="home_hero_none">No alarm scheduled</string>
+    <string name="home_next_in">%1$s · in %2$s</string>
+    <string name="dur_under_minute">under 1 min</string>
+    <string name="dur_min">%1$d min</string>
+    <string name="dur_h">%1$d h</string>
+    <string name="dur_h_min">%1$d h %2$d min</string>
+    <string name="dur_d_h">%1$d d %2$d h</string>
 
     <!-- weekly schedule summary on the home screen -->
     <string name="schedule_none">No days on</string>
@@ -30,6 +41,16 @@
     <string name="week_day_on">ON</string>
     <string name="week_day_off">OFF</string>
     <string name="week_time_cd">%1$s time %2$s. Change.</string>
+    <string name="week_time_open_cd">%1$s time %2$s. Editing. Close.</string>
+    <string name="week_edit_hour">HOUR</string>
+    <string name="week_edit_minute">MINUTE</string>
+    <string name="week_edit_minus">−</string>
+    <string name="week_edit_plus">+</string>
+    <string name="week_edit_hour_down_cd">Hour earlier</string>
+    <string name="week_edit_hour_up_cd">Hour later</string>
+    <string name="week_edit_minute_down_cd">Minute earlier</string>
+    <string name="week_edit_minute_up_cd">Minute later</string>
+    <string name="week_edit_hint">Hold to repeat. Saved as you change it.</string>
     <string name="week_ring_on_cd">%1$s rings %2$s. Turn off.</string>
     <string name="week_ring_off_cd">%1$s is off. Turn on.</string>
     <string name="week_select_cd">%1$s. Pick as copy source.</string>
@@ -84,7 +105,8 @@
     <string name="guard_eyebrow">STILL UP?</string>
     <string name="guard_unit">STEPS TO GO</string>
     <string name="guard_unit_one">STEP TO GO</string>
-    <string name="guard_footnote">STOP MOVING AND THIS COMES BACK LOUDER.</string>
+    <string name="guard_footnote">UNDER 40 STEPS BY %1$s AND THE ALARM RETURNS.</string>
+    <string name="guard_footnote_plain">UNDER 40 STEPS AND THE ALARM RETURNS.</string>
     <string name="guard_no_sensor">STEP SENSOR OFF. SCAN THE CODE AGAIN.</string>
     <string name="guard_scan_again">SCAN AGAIN</string>
 
@@ -104,5 +126,9 @@
     <string name="notif_title_alarm">WAKE UP</string>
     <string name="notif_title_guard">STILL UP?</string>
     <string name="notif_text_alarm">Scan your code to stop</string>
-    <string name="notif_text_guard">40 steps or the alarm returns</string>
+    <string name="notif_text_guard">%1$s · alarm returns at %2$s</string>
+    <plurals name="notif_steps">
+        <item quantity="one">%d step to go</item>
+        <item quantity="other">%d steps to go</item>
+    </plurals>
 </resources>

@@ -1,19 +1,12 @@
 package com.mrjshzk.riseup
 
-import android.Manifest
 import android.app.Activity
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.LinearInterpolator
@@ -29,14 +22,17 @@ import java.util.Locale
  * The ringing screen and the guard. One sentence, one number, one control.
  * Spec: docs/ui-spec.md §2 and §3. Behaviour (barcode gate, 40 steps, 90 s guard,
  * no snooze, no dismiss, Back swallowed) is unchanged by this pass.
+ *
+ * In guard mode this screen is only a readout: [AlarmService] counts the steps and
+ * [AlarmScheduler] owns the escalation, so neither depends on this Activity being
+ * on screen.
  */
 class AlarmActivity : Activity() {
 
     companion object {
         const val EXTRA_MODE = "mode"
         private const val REQ_SCAN = 11
-        private const val STEPS_TARGET = 40
-        private const val GUARD_WINDOW_MS = 150_000L
+        private const val STEPS_TARGET = AlarmService.STEPS_TARGET
 
         fun launch(ctx: Context, mode: String) {
             val i = Intent(ctx, AlarmActivity::class.java)
@@ -62,9 +58,6 @@ class AlarmActivity : Activity() {
     private var progressFill: View? = null
     private var progressFraction = 0f
 
-    private var sensorManager: SensorManager? = null
-    private var baseSteps = -1f
-    private var remainingSteps = STEPS_TARGET
     private var guardDone = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,7 +68,6 @@ class AlarmActivity : Activity() {
         window.attributes = window.attributes.apply { screenBrightness = 0.9f }
         setShowWhenLocked(true)
         setTurnScreenOn(true)
-        sensorManager = getSystemService(SensorManager::class.java)
         mode = intent.getStringExtra(EXTRA_MODE) ?: AlarmService.MODE_ALARM
         render()
     }
@@ -86,6 +78,13 @@ class AlarmActivity : Activity() {
         if (scannedAt > 0L && System.currentTimeMillis() - scannedAt < 120_000L) {
             Prefs.setScanOkAt(this, 0L)
             if (mode == AlarmService.MODE_ALARM) onDismissed() else finishGuard()
+            return
+        }
+        if (mode == AlarmService.MODE_GUARD) {
+            // The guard ended while this screen was not showing — either the steps were
+            // walked, or it escalated and the alarm owns the notification now. Leave
+            // without touching the service in both cases.
+            if (!Prefs.guardPending(this)) finish() else ensureCounting()
         }
     }
 
@@ -97,7 +96,7 @@ class AlarmActivity : Activity() {
 
     override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
-        unregisterSteps()
+        detachSteps()
         super.onDestroy()
     }
 
@@ -109,7 +108,9 @@ class AlarmActivity : Activity() {
     // ---------------------------------------------------------------- rendering
 
     private fun render() {
-        unregisterSteps()
+        detachSteps()
+        // A re-render (onNewIntent) must not leave the previous mode's callbacks queued.
+        handler.removeCallbacksAndMessages(null)
         val root = insetRoot()
         val column = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -191,19 +192,19 @@ class AlarmActivity : Activity() {
         column.addView(ui.label(getString(R.string.guard_eyebrow), ui.c(R.color.riseup_accent)))
         column.addView(ui.spacer(24))
 
-        val canCount = hasStepPermission() &&
-            sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null
+        val canCount = AlarmService.canCountSteps(this)
+        val remaining = AlarmService.remainingSteps
 
         if (canCount) {
-            val count = ui.display("$STEPS_TARGET", ui.c(R.color.riseup_text), ui.monoBold)
+            val count = ui.display("$remaining", ui.c(R.color.riseup_text), ui.monoBold)
             stepsView = count
             column.addView(count)
             column.addView(ui.spacer(8))
-            val unit = ui.label(getString(R.string.guard_unit), ui.c(R.color.riseup_text_dim))
+            val unit = ui.label(unitFor(remaining), ui.c(R.color.riseup_text_dim))
             unitView = unit
             column.addView(unit)
             column.addView(ui.spacer(24))
-            column.addView(progressBar())
+            column.addView(progressBar(remaining))
         } else {
             stepsView = null
             unitView = null
@@ -225,17 +226,27 @@ class AlarmActivity : Activity() {
             column.addView(ui.spacer(24))
         }
 
-        val footnote = ui.label(getString(R.string.guard_footnote), ui.c(R.color.riseup_text_faint))
+        // The consequence as a fact: a fixed clock time, not a countdown that moves.
+        val footnote = ui.label(guardFootnote(), ui.c(R.color.riseup_text_faint))
         footnote.maxWidth = ui.dp(345)
         column.addView(footnote)
         column.addView(ui.spacer(16))
 
-        if (canCount) startSteps()
-        handler.postDelayed({ escalate() }, GUARD_WINDOW_MS)
+        // onResume follows every render and makes sure the service is counting.
+        if (canCount) AlarmService.stepListener = { left -> onSteps(left) }
     }
 
+    private fun guardFootnote(): String {
+        val deadline = Prefs.guardDeadline(this)
+        if (deadline <= 0L) return getString(R.string.guard_footnote_plain)
+        return getString(R.string.guard_footnote, clockFormat.format(Date(deadline)))
+    }
+
+    private fun unitFor(remaining: Int): String =
+        getString(if (remaining == 1) R.string.guard_unit_one else R.string.guard_unit)
+
     /** 4 dp track, `line`; fill `accent`; width = steps done / 40. */
-    private fun progressBar(): FrameLayout {
+    private fun progressBar(remaining: Int): FrameLayout {
         val track = FrameLayout(this).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, ui.dp(4)
@@ -249,7 +260,7 @@ class AlarmActivity : Activity() {
         track.addView(fill)
         progressTrack = track
         progressFill = fill
-        progressFraction = (STEPS_TARGET - remainingSteps).toFloat() / STEPS_TARGET
+        progressFraction = (STEPS_TARGET - remaining).toFloat() / STEPS_TARGET
         track.addOnLayoutChangeListener { _, l, _, r, _, ol, _, or2, _ ->
             if (r - l != or2 - ol) applyProgress(animate = false)
         }
@@ -281,45 +292,33 @@ class AlarmActivity : Activity() {
         }
     }
 
-    private fun hasStepPermission(): Boolean =
-        ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) ==
-            PackageManager.PERMISSION_GRANTED
-
     // ------------------------------------------------------------------ steps
 
-    private val stepListener = object : SensorEventListener {
-        override fun onSensorChanged(event: SensorEvent) {
-            val value = event.values.getOrNull(0) ?: return
-            if (baseSteps < 0f) baseSteps = value
-            val taken = (value - baseSteps).toInt().coerceAtLeast(0)
-            remainingSteps = (STEPS_TARGET - taken).coerceAtLeast(0)
-            stepsView?.text = "$remainingSteps"
-            unitView?.text = getString(
-                if (remainingSteps == 1) R.string.guard_unit_one else R.string.guard_unit
-            )
-            progressFraction = (STEPS_TARGET - remainingSteps).toFloat() / STEPS_TARGET
-            applyProgress(animate = true)
-            if (remainingSteps == 0) finishGuard()
-        }
-
-        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-            // unused
-        }
+    private fun onSteps(remaining: Int) {
+        if (mode != AlarmService.MODE_GUARD) return
+        stepsView?.text = "$remaining"
+        unitView?.text = unitFor(remaining)
+        progressFraction = (STEPS_TARGET - remaining).toFloat() / STEPS_TARGET
+        applyProgress(animate = true)
+        if (remaining == 0) finishGuard()
     }
 
-    private fun startSteps() {
-        val sm = sensorManager ?: return
-        val sensor = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) ?: return
-        baseSteps = -1f
-        sm.registerListener(stepListener, sensor, SensorManager.SENSOR_DELAY_UI, handler)
-    }
-
-    private fun unregisterSteps() {
+    /**
+     * The guard screen can be reached from the notification after the service died or
+     * never started; asking for guard mode again is idempotent while it is counting.
+     */
+    private fun ensureCounting() {
+        if (guardDone || !Prefs.guardPending(this)) return
+        if (!AlarmService.canCountSteps(this)) return
         try {
-            sensorManager?.unregisterListener(stepListener)
+            ContextCompat.startForegroundService(this, AlarmService.intent(this, AlarmService.MODE_GUARD))
         } catch (e: Exception) {
-            // ignore
+            // The receiver already started it; nothing else to try from here.
         }
+    }
+
+    private fun detachSteps() {
+        AlarmService.stepListener = null
     }
 
     // ------------------------------------------------------------------ outcomes
@@ -333,7 +332,7 @@ class AlarmActivity : Activity() {
 
     private fun onDismissed() {
         Prefs.setScanOkAt(this, 0L)
-        unregisterSteps()
+        detachSteps()
         handler.removeCallbacksAndMessages(null)
         AlarmService.stop(this)
         AlarmScheduler.scheduleNextAlarm(this)
@@ -345,28 +344,10 @@ class AlarmActivity : Activity() {
         if (guardDone) return
         guardDone = true
         Prefs.setScanOkAt(this, 0L)
-        unregisterSteps()
+        detachSteps()
         handler.removeCallbacksAndMessages(null)
         AlarmScheduler.cancelGuard(this)
         AlarmService.stop(this)
         finish()
-    }
-
-    private fun escalate() {
-        if (guardDone) return
-        guardDone = true
-        Prefs.setScanOkAt(this, 0L)
-        unregisterSteps()
-        handler.removeCallbacksAndMessages(null)
-        // The service keeps running: re-issuing it with MODE_ALARM flips the same
-        // instance back to full-volume ringing.
-        try {
-            ContextCompat.startForegroundService(this, AlarmService.intent(this, AlarmService.MODE_ALARM))
-        } catch (e: Exception) {
-            // ignore
-        }
-        mode = AlarmService.MODE_ALARM
-        guardDone = false
-        render()
     }
 }
