@@ -14,12 +14,17 @@ import java.time.ZonedDateTime
 object AlarmScheduler {
     const val ACTION_ALARM = "com.mrjshzk.riseup.ACTION_ALARM"
     const val ACTION_GUARD = "com.mrjshzk.riseup.ACTION_GUARD"
+    const val ACTION_ESCALATE = "com.mrjshzk.riseup.ACTION_ESCALATE"
 
     private const val REQ_ALARM = 1001
     private const val REQ_GUARD = 1002
     private const val REQ_TEST = 1003
+    private const val REQ_ESCALATE = 1004
 
     const val GUARD_DELAY_MS = 90_000L
+
+    /** Time the guard gives you to walk before the full alarm returns. */
+    const val GUARD_WINDOW_MS = 150_000L
 
     /** Today plus one full lap of the week, so "only this weekday is on" still resolves. */
     private const val LOOKAHEAD_DAYS = 7L
@@ -139,10 +144,29 @@ object AlarmScheduler {
         }
     }
 
+    /**
+     * Arms the "you stopped walking" alarm. Lives in AlarmManager, not in the guard
+     * screen: the screen may never be shown (background-activity-start limits, phone in
+     * a pocket), and the consequence must not depend on it.
+     */
+    fun scheduleEscalation(ctx: Context) {
+        val am = ctx.getSystemService(AlarmManager::class.java) ?: return
+        val at = System.currentTimeMillis() + GUARD_WINDOW_MS
+        Prefs.setGuardDeadline(ctx, at)
+        try {
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi(ctx, REQ_ESCALATE, ACTION_ESCALATE))
+        } catch (e: SecurityException) {
+            am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi(ctx, REQ_ESCALATE, ACTION_ESCALATE))
+        }
+    }
+
+    /** Clears the pending guard and its escalation. Safe to call when neither is armed. */
     fun cancelGuard(ctx: Context) {
         val am = ctx.getSystemService(AlarmManager::class.java) ?: return
         am.cancel(pi(ctx, REQ_GUARD, ACTION_GUARD))
+        am.cancel(pi(ctx, REQ_ESCALATE, ACTION_ESCALATE))
         Prefs.setGuardPending(ctx, false)
+        Prefs.setGuardDeadline(ctx, 0L)
     }
 
     /** Fire a full alarm in [delayMs] so the whole chain can be proven without waiting for 07:00. */

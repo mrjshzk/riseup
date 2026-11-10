@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The mark: one flat square above one hairline horizon. Same parts as the UI — the 8 dp
+  state square and the 1 dp rule — at icon scale, in the two colours the app uses.
+  Everything sits inside the 66 dp safe circle, so any launcher mask leaves it whole.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- sun: riseup_accent -->
+    <path
+        android:fillColor="#FF6E52"
+        android:pathData="M46,39h16v16h-16z" />
+    <!-- horizon: riseup_text -->
+    <path
+        android:fillColor="#F4F3EF"
+        android:pathData="M30,63h48v3h-48z" />
+</vector>

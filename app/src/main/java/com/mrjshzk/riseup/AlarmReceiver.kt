@@ -9,15 +9,25 @@ class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             AlarmScheduler.ACTION_ALARM -> {
-                Prefs.setGuardPending(context, false)
+                // A real alarm supersedes any guard still in flight.
+                AlarmScheduler.cancelGuard(context)
                 fire(context, AlarmService.MODE_ALARM)
                 AlarmActivity.launch(context, AlarmService.MODE_ALARM)
             }
 
             AlarmScheduler.ACTION_GUARD -> {
                 if (!Prefs.guardPending(context)) return
+                AlarmScheduler.scheduleEscalation(context)
                 fire(context, AlarmService.MODE_GUARD)
                 AlarmActivity.launch(context, AlarmService.MODE_GUARD)
+            }
+
+            AlarmScheduler.ACTION_ESCALATE -> {
+                // Steps done or code rescanned already cleared the flag.
+                if (!Prefs.guardPending(context)) return
+                AlarmScheduler.cancelGuard(context)
+                fire(context, AlarmService.MODE_ALARM)
+                AlarmActivity.launch(context, AlarmService.MODE_ALARM)
             }
         }
     }
@@ -35,6 +45,7 @@ class AlarmReceiver : BroadcastReceiver() {
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         Prefs.setGuardPending(context, false)
+        Prefs.setGuardDeadline(context, 0L)
         AlarmScheduler.scheduleNextAlarm(context)
     }
 }

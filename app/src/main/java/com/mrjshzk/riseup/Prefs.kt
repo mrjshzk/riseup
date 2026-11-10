@@ -132,6 +132,10 @@ object Prefs {
     fun guardPending(c: Context): Boolean = p(c).getBoolean("guard_pending", false)
     fun setGuardPending(c: Context, v: Boolean) = p(c).edit().putBoolean("guard_pending", v).apply()
 
+    /** Wall-clock instant the guard escalates back to the full alarm; 0 when none is armed. */
+    fun guardDeadline(c: Context): Long = p(c).getLong("guard_deadline", 0L)
+    fun setGuardDeadline(c: Context, v: Long) = p(c).edit().putLong("guard_deadline", v).apply()
+
     /** Timestamp of a successful dismiss-code scan. Used instead of an activity
      *  result, which is unreliable when the alarm activity runs singleInstance. */
     fun scanOkAt(c: Context): Long = p(c).getLong("scan_ok_at", 0L)
