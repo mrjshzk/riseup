@@ -96,6 +96,6 @@ Current scheduler unit tests are in `app/src/test/java/com/mrjshzk/riseup/AlarmS
 
 ## Release notes / caveats
 
-- The public `v1.2` release predates the merged `b96deb3` three-tab/footsteps changes. The pulled branch builds only after correcting the malformed package declaration in `MainActivity.kt`; that correction is currently local and uncommitted unless subsequently pushed.
+- The public `v1.2` release predates the merged `b96deb3` three-tab/footsteps changes, so the published APK does not contain them. Cut a new release once the branch has been verified on the phone.
 - The current code has not been visually verified on a physical phone after the three-tab change. Verify touch targets, tab navigation, sensor permission denial/fallback, alarm dismissal, and the follow-up guard on the CMF Phone 2 Pro before treating this branch as a release.
 - APKs in `dist/`, build outputs, emulator screenshots, and local Android SDK configuration are ignored from source control. Publish binaries as GitHub Release assets.
