@@ -79,7 +79,18 @@ gradle testDebugUnitTest
 
 APK output: `app/build/outputs/apk/debug/app-debug.apk`.
 
-On the project VPS, set `JAVA_HOME=/home/mrjshzk/opt/jdk-17.0.21+9` and `ANDROID_HOME=/home/mrjshzk/android-sdk`; use `/home/mrjshzk/opt/gradle-8.10.2/bin/gradle`. This host has 2 vCPU. Do not run Gradle builds concurrently with the software-rendered emulator; see the `android-apk-from-vps` skill for emulator limits and validation.
+Builds run on **Atlas** — the Debian 13 home machine that also hosts Hermes. The toolchain is a one-time install there (JDK 17, Android SDK platform 35 + Build Tools 35.0.0, Gradle 8.10.2); it is not preinstalled, so check `java -version` and `sdkmanager --list` before trusting a build. Install under `/opt/data/opt/` and export the paths:
+
+```bash
+export JAVA_HOME=/opt/data/opt/jdk-17
+export ANDROID_HOME=/opt/data/opt/android-sdk
+export PATH=/opt/data/opt/gradle-8.10.2/bin:$JAVA_HOME/bin:$PATH
+echo "sdk.dir=$ANDROID_HOME" > local.properties
+```
+
+Inside the Hermes container `/opt/data` is the host's `/home/miguel/.hermes`, so from a shell on Atlas itself the same directories read `/home/miguel/.hermes/opt/…`. Atlas has 8 vCPU and 15 GB RAM, so a build and an emulator can coexist, but `gradle.properties` caps workers at 2 on purpose: leave it there so a build does not starve the machine.
+
+Nothing here depends on a specific host: `local.properties` and the two environment variables carry every path. Validation still belongs on the phone — an emulator does not exercise the camera, the step sensor, the notification or the lock screen, so UI and alarm-lifecycle changes are checked on the CMF Phone 2 Pro.
 
 Current scheduler unit tests are in `app/src/test/java/com/mrjshzk/riseup/AlarmSchedulerTest.kt`. After any code change, build and run tests before producing an APK. For UI or alarm lifecycle changes, test on a device when possible; scheduler unit tests do not verify camera, sensor, notification, lock-screen, or manufacturer battery behaviour.
 
